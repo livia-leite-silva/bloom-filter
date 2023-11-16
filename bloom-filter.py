@@ -35,9 +35,7 @@ class BloomFilter:
         for hashFunction in self.hashFunctions:
             index = hashFunction(element) % self.size
             if self.data[index] != 1:
-                print('nao pertence')
                 return False
-        print('pertence')
         return True
 
     def falsePositive(self):
