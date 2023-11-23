@@ -1,10 +1,10 @@
 import math 
 
 class BloomFilter:
-    def __init__(self, arraySize, qtyData, hashFunction):
+    def __init__(self, arraySize, qtyData, hashFunctions):
+        self.hashFunctions = hashFunctions
         self.size = arraySize
         self.qtyData = qtyData
-        self.hashFunction = hashFunction
         self.appendZero()
 
     def appendZero(self):
@@ -13,19 +13,17 @@ class BloomFilter:
             self.array.append(0)
 
     def add(self, email):
-        numHashFunction = self.numHashFunction()
-        for _ in range(numHashFunction):
-            index = self.hashFunction(email) % self.size
+        for hashFunction in self.hashFunctions:
+            index = hashFunction(email) % self.size
             self.array[index] = 1
 
     def search(self, email):
-        numHashFunction = self.numHashFunction()
-        for _ in range(numHashFunction):
-            index = self.hashFunction(email) % self.size
+        for hashFunction in self.hashFunctions:
+            index = hashFunction(email) % self.size
             if self.array[index] != 1:
-                print(f'{email} não é spam')
+                print(f'{email} NÃO é spam')
                 return False
-        print(f'{email} é \033[91mspam\033[0m')
+        print(f'{email} é spam')
         return True
 
     def falsePositive(self):
@@ -41,12 +39,17 @@ class BloomFilter:
         return round(k)
 
 
-def hashFunction(email):
+def hashFunction1(email):
     hash = 0
     for i in range(10):
         hash = hash * 7 + ord(email[i])
     return hash
 
+def hashFunction2(email):
+    hash = 10
+    for i in range(10):
+        hash = hash * 7 + ord(email[i])
+    return hash
 
 spam = ['jackfreestuff@gmail.com','emilyx3y9z@outlook.com',
 'liamq1r8p@gmail.com.br','ethanm5n2b@gmail.com.br','olivial7k4a@gmail.com.br',
@@ -58,13 +61,15 @@ spam = ['jackfreestuff@gmail.com','emilyx3y9z@outlook.com',
 'petparadiseb9z3a@gmail.com','musicalmusem8p2o@gmail.com','gamegalaxyg2r9x@gmail.com',
 'vintagefindsv5u7r@gmail.com','shoestringmarts8t4o@gmail.com','cosmicemporiumc6p1a@gmail.com']
 
-checkList = ['john.doe@example.com','maria.silva@example.com','ontact@shopxyz.com','info@companyabc.biz','let23583@gmail.com', 'joselima@gmail.com', 'lunaj335f@gmail.com', 'alvarodasilvad@gmail.com',
+checkList = ['john.doe@example.com','maria.silva@example.com','ontact@shopxyz.com',
+'info@companyabc.biz','let23583@gmail.com', 'joselima@gmail.com', 'lunaj335f@gmail.com', 
+'alvarodasilvad@gmail.com',
+
 'jackfreestuff@gmail.com','emilyx3y9z@outlook.com','liamq1r8p@gmail.com.br',
 'ethanm5n2b@gmail.com.br', 'homeharmonyn5c8e@gmail.com','bookbazaarb3m9p@gmail.com',
 'foodfusionk7q2r@gmail.com', 'cosmicemporiumc6p1a@gmail.com']
 
-
-bloomfilter = BloomFilter(50, len(spam), hashFunction)
+bloomfilter = BloomFilter(50, len(spam),[hashFunction1, hashFunction2])
 
 print(f'\nNúmero de funções de hash: {bloomfilter.numHashFunction()}')
 print(f'Probabilidade de falso positivo: {bloomfilter.falsePositive()}%\n')
